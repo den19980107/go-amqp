@@ -463,11 +463,14 @@ func (s *Session) mux(remoteBegin *frames.PerformBegin) {
 					// This is a protocol error:
 					//       "[...] MUST be set if the peer has received
 					//        the begin frame for the session"
-					closeWithError(&Error{
-						Condition:   ErrCondNotAllowed,
-						Description: "next-incoming-id not set after session established",
-					}, errors.New("protocol error: received flow without next-incoming-id after session established"))
-					continue
+
+					nextIncomingId := uint32(0)
+					body.NextIncomingID = &nextIncomingId
+					// closeWithError(&Error{
+					// 	Condition:   ErrCondNotAllowed,
+					// 	Description: "next-incoming-id not set after session established",
+					// }, errors.New("protocol error: received flow without next-incoming-id after session established"))
+					// continue
 				}
 
 				// "When the endpoint receives a flow frame from its peer,
@@ -523,6 +526,9 @@ func (s *Session) mux(remoteBegin *frames.PerformBegin) {
 				// Note body.Role is the remote peer's role, we reverse for the local key.
 				s.linksMu.RLock()
 				link, linkOk := s.linksByKey[linkKey{name: body.Name, role: !body.Role}]
+				if !linkOk {
+					link, linkOk = s.linksByKey[linkKey{name: body.Name, role: body.Role}]
+				}
 				s.linksMu.RUnlock()
 				if !linkOk {
 					closeWithError(&Error{

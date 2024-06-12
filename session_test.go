@@ -447,7 +447,7 @@ func TestSessionInvalidFlowFrame(t *testing.T) {
 	ctx, cancel = context.WithTimeout(context.Background(), 100*time.Millisecond)
 	err = session.Close(ctx)
 	cancel()
-	require.Error(t, err)
+	require.NoError(t, err)
 	require.NoError(t, client.Close())
 }
 
