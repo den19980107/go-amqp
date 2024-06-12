@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"net"
 	"net/url"
@@ -99,6 +100,7 @@ type ConnOptions struct {
 //
 // opts: pass nil to accept the default values.
 func Dial(ctx context.Context, addr string, opts *ConnOptions) (*Conn, error) {
+	log.Printf("check if edit work")
 	c, err := dialConn(ctx, addr, opts)
 	if err != nil {
 		return nil, err
